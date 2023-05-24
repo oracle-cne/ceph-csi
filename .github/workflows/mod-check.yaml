@@ -1,0 +1,18 @@
+---
+name: mod-check
+# yamllint disable-line rule:truthy
+on:
+  pull_request:
+    branches:
+      - '*'
+permissions:
+  contents: read
+
+jobs:
+  mod-check:
+    name: mod-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: mod-check
+        run: CONTAINER_CMD=docker make containerized-test TARGET=mod-check
