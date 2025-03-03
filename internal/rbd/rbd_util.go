@@ -28,6 +28,13 @@ import (
 	"strings"
 	"time"
 
+<<<<<<< HEAD
+=======
+	"github.com/ceph/ceph-csi/pkg/util/crypto"
+	"github.com/ceph/ceph-csi/pkg/util/kernel"
+
+	rbderrors "github.com/ceph/ceph-csi/internal/rbd/errors"
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 	"github.com/ceph/ceph-csi/internal/rbd/types"
 	"github.com/ceph/ceph-csi/internal/util"
 	"github.com/ceph/ceph-csi/internal/util/log"
@@ -524,7 +531,11 @@ func (ri *rbdImage) open() (*librbd.Image, error) {
 	image, err := librbd.OpenImage(ri.ioctx, ri.RbdImageName, librbd.NoSnapshot)
 	if err != nil {
 		if errors.Is(err, librbd.ErrNotFound) {
+<<<<<<< HEAD
 			err = fmt.Errorf("Failed as %w (internal %w)", ErrImageNotFound, err)
+=======
+			err = fmt.Errorf("Failed as %w (internal %w)", rbderrors.ErrImageNotFound, err)
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 		}
 
 		return nil, err
@@ -542,7 +553,11 @@ func (ri *rbdImage) open() (*librbd.Image, error) {
 func (ri *rbdImage) isInUse() (bool, error) {
 	image, err := ri.open()
 	if err != nil {
+<<<<<<< HEAD
 		if errors.Is(err, ErrImageNotFound) || errors.Is(err, util.ErrPoolNotFound) {
+=======
+		if errors.Is(err, rbderrors.ErrImageNotFound) || errors.Is(err, util.ErrPoolNotFound) {
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 			return false, err
 		}
 		// any error should assume something else is using the image
@@ -681,7 +696,11 @@ func (ri *rbdImage) Delete(ctx context.Context) error {
 	err = rbdImage.Trash(0)
 	if err != nil {
 		if errors.Is(err, librbd.ErrNotFound) {
+<<<<<<< HEAD
 			return fmt.Errorf("Failed as %w (internal %w)", ErrImageNotFound, err)
+=======
+			return fmt.Errorf("Failed as %w (internal %w)", rbderrors.ErrImageNotFound, err)
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 		}
 
 		log.ErrorLog(ctx, "failed to delete rbd image: %s, error: %v", ri, err)
@@ -731,7 +750,18 @@ func (rv *rbdVolume) DeleteTempImage(ctx context.Context) error {
 	tempClone := rv.generateTempClone()
 	err := tempClone.Delete(ctx)
 	if err != nil {
+<<<<<<< HEAD
 		if errors.Is(err, ErrImageNotFound) {
+=======
+		if !errors.Is(err, rbderrors.ErrImageNotFound) && !errors.Is(err, rbderrors.ErrSnapNotFound) {
+			return fmt.Errorf("failed to delete snapshot %q: %w", snap, err)
+		}
+	}
+
+	err = tempClone.Delete(ctx)
+	if err != nil {
+		if errors.Is(err, rbderrors.ErrImageNotFound) {
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 			return tempClone.ensureImageCleanup(ctx)
 		} else {
 			// return error if it is not ErrImageNotFound
@@ -770,7 +800,11 @@ func (ri *rbdImage) getCloneDepth(ctx context.Context) (uint, error) {
 			// if the parent image is moved to trash the name will be present
 			// in rbd image info but the image will be in trash, in that case
 			// return the found depth
+<<<<<<< HEAD
 			if errors.Is(err, ErrImageNotFound) {
+=======
+			if errors.Is(err, rbderrors.ErrImageNotFound) {
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 				return depth, nil
 			}
 			log.ErrorLog(ctx, "failed to check depth on image %s: %s", &vol, err)
@@ -865,7 +899,7 @@ func (ri *rbdImage) flattenRbdImage(
 			return err
 		}
 		if forceFlatten || depth >= hardlimit {
-			return fmt.Errorf("%w: flatten is in progress for image %s", ErrFlattenInProgress, ri.RbdImageName)
+			return fmt.Errorf("%w: flatten is in progress for image %s", rbderrors.ErrFlattenInProgress, ri.RbdImageName)
 		}
 		log.DebugLog(ctx, "successfully added task to flatten image %q", ri)
 	}
@@ -956,7 +990,11 @@ func (ri *rbdImage) checkImageChainHasFeature(ctx context.Context, feature uint6
 			// is in the trash, when we try to open the parent image to get its
 			// information it fails because it is already in trash. We should
 			// treat error as nil if the parent is not found.
+<<<<<<< HEAD
 			if errors.Is(err, ErrImageNotFound) {
+=======
+			if errors.Is(err, rbderrors.ErrImageNotFound) {
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 				return false, nil
 			}
 			log.ErrorLog(ctx, "failed to get image info for %s: %s", rbdImg.String(), err)
@@ -1194,6 +1232,33 @@ func generateVolumeFromVolumeID(
 	return rbdVol, err
 }
 
+// ShouldRetryVolumeGeneration determines whether the process of finding or generating
+// volumes should continue based on the type of error encountered.
+//
+// It checks if the given error matches any of the following known errors:
+//   - util.ErrKeyNotFound: The key required to locate the volume is missing in Rados omap.
+//   - util.ErrPoolNotFound: The rbd pool where the volume/omap is expected doesn't exist.
+//   - ErrImageNotFound: The image doesn't exist in the rbd pool.
+//   - rados.ErrPermissionDenied: Permissions to access the pool is denied.
+//
+// If any of these errors are encountered, the function returns `true`, indicating
+// that the volume search should continue because of known error. Otherwise, it
+// returns `false`, meaning the search should stop.
+//
+// This helper function is used in scenarios where multiple attempts may be made
+// to retrieve or generate volume information, and we want to gracefully handle
+// specific failure cases while retrying for others.
+func ShouldRetryVolumeGeneration(err error) bool {
+	if err == nil {
+		return false // No error, do not retry
+	}
+	// Continue searching for specific known errors
+	return (errors.Is(err, util.ErrKeyNotFound) ||
+		errors.Is(err, util.ErrPoolNotFound) ||
+		errors.Is(err, rbderrors.ErrImageNotFound) ||
+		errors.Is(err, rados.ErrPermissionDenied))
+}
+
 // GenVolFromVolID generates a rbdVolume structure from the provided identifier, updating
 // the structure with elements from on-disk image metadata as well.
 func GenVolFromVolID(
@@ -1210,11 +1275,15 @@ func GenVolFromVolID(
 	err := vi.DecomposeCSIID(volumeID)
 	if err != nil {
 		return vol, fmt.Errorf("%w: error decoding volume ID (%w) (%s)",
-			ErrInvalidVolID, err, volumeID)
+			rbderrors.ErrInvalidVolID, err, volumeID)
 	}
 
 	vol, err = generateVolumeFromVolumeID(ctx, volumeID, vi, cr, secrets)
+<<<<<<< HEAD
 	if !shouldRetryVolumeGeneration(err) {
+=======
+	if !ShouldRetryVolumeGeneration(err) {
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 		return vol, err
 	}
 
@@ -1225,7 +1294,11 @@ func GenVolFromVolID(
 	}
 	if mapping != nil {
 		rbdVol, vErr := generateVolumeFromMapping(ctx, mapping, volumeID, vi, cr, secrets)
+<<<<<<< HEAD
 		if !shouldRetryVolumeGeneration(vErr) {
+=======
+		if !ShouldRetryVolumeGeneration(vErr) {
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 			return rbdVol, vErr
 		}
 	}
@@ -1278,7 +1351,11 @@ func generateVolumeFromMapping(
 					// Add mapping poolID to Identifier
 					nvi.LocationID = pID
 					vol, err = generateVolumeFromVolumeID(ctx, volumeID, nvi, cr, secrets)
+<<<<<<< HEAD
 					if !shouldRetryVolumeGeneration(err) {
+=======
+					if !ShouldRetryVolumeGeneration(err) {
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 						return vol, err
 					}
 				}
@@ -1499,7 +1576,7 @@ func (ri *rbdImage) deleteSnapshot(ctx context.Context, pOpts *rbdSnapshot) erro
 	}
 	err = snap.Remove()
 	if errors.Is(err, librbd.ErrNotFound) {
-		return fmt.Errorf("Failed as %w (internal %w)", ErrSnapNotFound, err)
+		return fmt.Errorf("Failed as %w (internal %w)", rbderrors.ErrSnapNotFound, err)
 	}
 
 	return err
@@ -1759,7 +1836,7 @@ func (ri *rbdImage) checkSnapExists(rbdSnap *rbdSnapshot) error {
 		}
 	}
 
-	return fmt.Errorf("%w: snap %s not found", ErrSnapNotFound, rbdSnap)
+	return fmt.Errorf("%w: snap %s not found", rbderrors.ErrSnapNotFound, rbdSnap)
 }
 
 // rbdImageMetadataStash strongly typed JSON spec for stashed RBD image metadata.
@@ -1841,7 +1918,7 @@ func lookupRBDImageMetadataStash(metaDataPath string) (rbdImageMetadataStash, er
 			return imgMeta, fmt.Errorf("failed to read stashed JSON image metadata from path (%s): %w", fPath, err)
 		}
 
-		return imgMeta, fmt.Errorf("Failed as %w (internal %w)", ErrMissingStash, err)
+		return imgMeta, fmt.Errorf("Failed as %w (internal %w)", rbderrors.ErrMissingStash, err)
 	}
 
 	err = json.Unmarshal(encodedBytes, &imgMeta)

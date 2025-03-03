@@ -29,6 +29,7 @@ import (
 	csicommon "github.com/ceph/ceph-csi/internal/csi-common"
 	"github.com/ceph/ceph-csi/internal/rbd"
 	corerbd "github.com/ceph/ceph-csi/internal/rbd"
+	rbderrors "github.com/ceph/ceph-csi/internal/rbd/errors"
 	"github.com/ceph/ceph-csi/internal/rbd/types"
 	"github.com/ceph/ceph-csi/internal/util"
 	"github.com/ceph/ceph-csi/internal/util/log"
@@ -651,7 +652,11 @@ func (rs *ReplicationServer) ResyncVolume(ctx context.Context,
 	sts, err := mirror.GetGlobalMirroringStatus(ctx)
 	if err != nil {
 		// the image gets recreated after issuing resync
+<<<<<<< HEAD
 		if errors.Is(err, corerbd.ErrImageNotFound) {
+=======
+		if errors.Is(err, rbderrors.ErrImageNotFound) {
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 			// caller retries till RBD syncs an initial version of the image to
 			// report its status in the resync call. Ideally, this line will not
 			// be executed as the error would get returned due to getMirroringInfo
@@ -785,6 +790,7 @@ func getGRPCError(err error) error {
 	}
 
 	errorStatusMap := map[error]codes.Code{
+<<<<<<< HEAD
 		corerbd.ErrImageNotFound:      codes.NotFound,
 		util.ErrPoolNotFound:          codes.NotFound,
 		corerbd.ErrInvalidArgument:    codes.InvalidArgument,
@@ -792,6 +798,15 @@ func getGRPCError(err error) error {
 		corerbd.ErrAborted:            codes.Aborted,
 		corerbd.ErrFailedPrecondition: codes.FailedPrecondition,
 		corerbd.ErrUnavailable:        codes.Unavailable,
+=======
+		rbderrors.ErrImageNotFound:      codes.NotFound,
+		util.ErrPoolNotFound:            codes.NotFound,
+		rbderrors.ErrInvalidArgument:    codes.InvalidArgument,
+		rbderrors.ErrFlattenInProgress:  codes.Aborted,
+		rbderrors.ErrAborted:            codes.Aborted,
+		rbderrors.ErrFailedPrecondition: codes.FailedPrecondition,
+		rbderrors.ErrUnavailable:        codes.Unavailable,
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 	}
 
 	for e, code := range errorStatusMap {
@@ -831,8 +846,13 @@ func (rs *ReplicationServer) GetVolumeReplicationInfo(ctx context.Context,
 	rbdVol, err := mgr.GetVolumeByID(ctx, volumeID)
 	if err != nil {
 		switch {
+<<<<<<< HEAD
 		case errors.Is(err, corerbd.ErrImageNotFound):
 			err = status.Errorf(codes.NotFound, err.Error())
+=======
+		case errors.Is(err, rbderrors.ErrImageNotFound):
+			err = status.Error(codes.NotFound, err.Error())
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 		case errors.Is(err, util.ErrPoolNotFound):
 			err = status.Errorf(codes.NotFound, err.Error())
 		default:
@@ -864,7 +884,13 @@ func (rs *ReplicationServer) GetVolumeReplicationInfo(ctx context.Context,
 
 	mirrorStatus, err := mirror.GetGlobalMirroringStatus(ctx)
 	if err != nil {
+<<<<<<< HEAD
 		if errors.Is(err, corerbd.ErrImageNotFound) {
+=======
+		log.ErrorLog(ctx, "failed to get status for mirror %q: %v", mirror, err)
+
+		if errors.Is(err, rbderrors.ErrImageNotFound) {
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 			return nil, status.Error(codes.Aborted, err.Error())
 		}
 		log.ErrorLog(ctx, err.Error())
@@ -886,7 +912,13 @@ func (rs *ReplicationServer) GetVolumeReplicationInfo(ctx context.Context,
 	description := remoteStatus.GetDescription()
 	resp, err := getLastSyncInfo(ctx, description)
 	if err != nil {
+<<<<<<< HEAD
 		if errors.Is(err, corerbd.ErrLastSyncTimeNotFound) {
+=======
+		log.ErrorLog(ctx, "failed to parse last sync info from %q: %v", description, err)
+
+		if errors.Is(err, rbderrors.ErrLastSyncTimeNotFound) {
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 			return nil, status.Errorf(codes.NotFound, "failed to get last sync info: %v", err)
 		}
 		log.ErrorLog(ctx, err.Error())
@@ -916,12 +948,12 @@ func getLastSyncInfo(ctx context.Context, description string) (*replication.GetV
 	var response replication.GetVolumeReplicationInfoResponse
 
 	if description == "" {
-		return nil, fmt.Errorf("empty description: %w", corerbd.ErrLastSyncTimeNotFound)
+		return nil, fmt.Errorf("empty description: %w", rbderrors.ErrLastSyncTimeNotFound)
 	}
 	log.DebugLog(ctx, "description: %s", description)
 	splittedString := strings.SplitN(description, ",", 2)
 	if len(splittedString) == 1 {
-		return nil, fmt.Errorf("no snapshot details: %w", corerbd.ErrLastSyncTimeNotFound)
+		return nil, fmt.Errorf("no snapshot details: %w", rbderrors.ErrLastSyncTimeNotFound)
 	}
 	type localStatus struct {
 		LocalSnapshotTime    int64  `json:"local_snapshot_timestamp"`
@@ -938,7 +970,7 @@ func getLastSyncInfo(ctx context.Context, description string) (*replication.GetV
 	// If the json unmarsal is successful but the local snapshot time is 0, we
 	// need to consider it as an error as the LastSyncTime is required.
 	if localSnapInfo.LocalSnapshotTime == 0 {
-		return nil, fmt.Errorf("empty local snapshot timestamp: %w", corerbd.ErrLastSyncTimeNotFound)
+		return nil, fmt.Errorf("empty local snapshot timestamp: %w", rbderrors.ErrLastSyncTimeNotFound)
 	}
 	if localSnapInfo.LastSnapshotDuration != nil {
 		// converts localSnapshotDuration of type int64 to string format with

@@ -21,6 +21,7 @@ import (
 	"errors"
 
 	"github.com/ceph/ceph-csi/internal/rbd"
+	rbderrors "github.com/ceph/ceph-csi/internal/rbd/errors"
 	"github.com/ceph/ceph-csi/internal/util"
 	"github.com/ceph/ceph-csi/internal/util/log"
 
@@ -69,7 +70,11 @@ func (ekrs *EncryptionKeyRotationServer) EncryptionKeyRotate(
 	rbdVol, err := rbd.GenVolFromVolID(ctx, volID, creds, req.GetSecrets())
 	if err != nil {
 		switch {
+<<<<<<< HEAD
 		case errors.Is(err, rbd.ErrImageNotFound):
+=======
+		case errors.Is(err, rbderrors.ErrImageNotFound):
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 			err = status.Errorf(codes.NotFound, "volume ID %s not found", volID)
 		case errors.Is(err, util.ErrPoolNotFound):
 			log.ErrorLog(ctx, "failed to get backend volume for %s: %v", volID, err)

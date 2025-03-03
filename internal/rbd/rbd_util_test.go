@@ -23,6 +23,12 @@ import (
 	"strings"
 	"testing"
 
+<<<<<<< HEAD
+=======
+	rbderrors "github.com/ceph/ceph-csi/internal/rbd/errors"
+	"github.com/ceph/ceph-csi/internal/util"
+
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 	"github.com/ceph/go-ceph/rados"
 	librbd "github.com/ceph/go-ceph/rbd"
 	"github.com/stretchr/testify/require"
@@ -418,7 +424,11 @@ func Test_shouldRetryVolumeGeneration(t *testing.T) {
 		},
 		{
 			name: "ErrImageNotFound (continue searching)",
+<<<<<<< HEAD
 			args: args{err: ErrImageNotFound},
+=======
+			args: args{err: rbderrors.ErrImageNotFound},
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 			want: true, // Known error, continue searching
 		},
 		{
@@ -435,8 +445,13 @@ func Test_shouldRetryVolumeGeneration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+<<<<<<< HEAD
 			if got := shouldRetryVolumeGeneration(tt.args.err); got != tt.want {
 				t.Errorf("shouldRetryVolumeGeneration() = %v, want %v", got, tt.want)
+=======
+			if got := ShouldRetryVolumeGeneration(tt.args.err); got != tt.want {
+				t.Errorf("ShouldRetryVolumeGeneration() = %v, want %v", got, tt.want)
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 			}
 		})
 	}

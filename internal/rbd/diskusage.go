@@ -18,6 +18,8 @@ package rbd
 
 import (
 	"fmt"
+
+	rbderrors "github.com/ceph/ceph-csi/internal/rbd/errors"
 )
 
 // Sparsify checks the size of the objects in the RBD image and calls
@@ -32,7 +34,7 @@ func (ri *rbdImage) Sparsify() error {
 	}
 	if inUse {
 		// if the image is in use, we should not sparsify it, return ErrImageInUse.
-		return ErrImageInUse
+		return rbderrors.ErrImageInUse
 	}
 
 	image, err := ri.open()

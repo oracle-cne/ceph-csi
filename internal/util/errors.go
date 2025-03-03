@@ -16,9 +16,13 @@ limitations under the License.
 
 package util
 
+<<<<<<< HEAD
 import (
 	"errors"
 )
+=======
+import "errors"
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 
 var (
 	// ErrKeyNotFound is returned when requested key in omap is not found.

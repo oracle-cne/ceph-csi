@@ -23,6 +23,7 @@ import (
 
 	csicommon "github.com/ceph/ceph-csi/internal/csi-common"
 	rbdutil "github.com/ceph/ceph-csi/internal/rbd"
+	rbderrors "github.com/ceph/ceph-csi/internal/rbd/errors"
 	"github.com/ceph/ceph-csi/internal/util"
 	"github.com/ceph/ceph-csi/internal/util/log"
 
@@ -78,8 +79,13 @@ func (rscs *ReclaimSpaceControllerServer) ControllerReclaimSpace(
 	}
 	defer rbdVol.Destroy(ctx)
 
+<<<<<<< HEAD
 	err = rbdVol.Sparsify()
 	if errors.Is(err, rbdutil.ErrImageInUse) {
+=======
+	err = rbdVol.Sparsify(ctx)
+	if errors.Is(err, rbderrors.ErrImageInUse) {
+>>>>>>> 5cbc1445 (cleanup: move internal/rbd/errors.go to internal/rbd/errors pacakge)
 		// FIXME: https://github.com/csi-addons/kubernetes-csi-addons/issues/406.
 		// treat sparsify call as no-op if volume is in use.
 		log.DebugLog(ctx, fmt.Sprintf("volume with ID %q is in use, skipping sparsify operation", volumeID))
