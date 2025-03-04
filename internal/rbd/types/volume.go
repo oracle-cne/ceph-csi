@@ -28,8 +28,13 @@ import (
 //nolint:interfacebloat // more than 10 methods are needed for the interface
 type Volume interface {
 	journalledObject
+<<<<<<< HEAD
 	// Destroy frees the resources used by the Volume.
 	Destroy(ctx context.Context)
+=======
+	snapshottableVolume
+	csiAddonsVolume
+>>>>>>> add4b369 (cleanup: move Destroy() method to journalledObject interface)
 
 	// Delete removes the volume from the storage backend.
 	Delete(ctx context.Context) error
