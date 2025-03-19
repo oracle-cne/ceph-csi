@@ -24,6 +24,9 @@ Group:              System/Management
 BuildRequires:      golang >= %{golang_version}
 BuildRequires:      librados-devel
 BuildRequires:      librbd-devel
+{{{- if semverCompare ">=3.10.0" $version }}}
+BuildRequires:      libcephfs-devel
+{{{- end }}}
 BuildRequires:      make
 BuildRequires:      git
 BuildRequires:      /usr/bin/cc
