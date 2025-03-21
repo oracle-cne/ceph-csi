@@ -12,6 +12,7 @@ quay.io/ceph/ceph:v19            ceph/ceph:v19
 
 # ceph-csi-operator
 quay.io/cephcsi/ceph-csi-operator:v0.2.0    cephcsi/ceph-csi-operator:v0.2.0
+quay.io/cephcsi/ceph-csi-operator:latest    cephcsi/ceph-csi-operator:latest
 
 # ceph-csi 3.10 and 3.11
 docker.io/rook/ceph:v1.12.1      rook/ceph:v1.12.1
