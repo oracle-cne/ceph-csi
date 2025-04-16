@@ -9,7 +9,7 @@
 %global app_name ceph-csi
 %global app_version {{{$version}}}
 %global oracle_release_version 1
-%global golang_version 1.20.12
+%global golang_version 1.22.7
 %global _buildhost	build-ol%{?oraclelinux}-%{?_arch}.oracle.com
 
 Name:               %{app_name}
