@@ -18,7 +18,13 @@
 %global arch x86_64
 %global custom_arch amd64
 %endif
+{{{- if semverCompare ">=3.13.1" $version }}}
+%global ceph_version "19.2.1"
+{{{- else if semverCompare ">=3.12.3" $version }}}
+%global ceph_version "18.2.2"
+{{{- else }}}
 %global ceph_version "17.2.5"
+{{{- end }}}
 
 
 Name:           %{_name}-container-image
@@ -71,7 +77,6 @@ podman save -o %{_name}.tar %{cephcsi_tag}
 %license LICENSE
 /usr/local/share/olcne/%{_name}.tar
 
-%changelog
 %changelog
 * {{{.changelog_timestamp}}} - {{{$version}}}-1
 - Added Oracle Specific Build Files for ceph-csi
