@@ -30,6 +30,7 @@ BuildRequires:      git
 BuildRequires:      /usr/bin/cc
 Requires:           librados2 >= 14.2.0
 Requires:           librbd1 >= 14.2.0
+Patch0:		    Makefile.patch
 
 %description
 A driver for the Kubernetes CSI using Ceph.  Ceph-csi enables the use of
@@ -38,6 +39,7 @@ Kubernetes APIs to manage Ceph storage.
 %prep
 export CGO_ENABLED=1
 %setup -n %{name}-%{version}
+%patch0
 
 %build
 make cephcsi LDFLAGS="-X main.version={{{$app_version}}}"
