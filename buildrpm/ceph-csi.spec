@@ -40,7 +40,7 @@ export CGO_ENABLED=1
 %setup -n %{name}-%{version}
 
 %build
-make cephcsi
+make cephcsi LDFLAGS="-X main.version={{{$app_version}}}"
 
 %install
 install -D -p -m 0555 _output/cephcsi %{buildroot}/usr/local/bin/cephcsi
