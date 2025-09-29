@@ -1,28 +1,11 @@
 ---
 version: 2
-enable-beta-ecosystems: true
 updates:
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "weekly"
     rebase-strategy: "disabled"
-    groups:
-      golang-dependencies:
-        patterns:
-          - "github.com/golang*"
-          - "golang.org/x/*"
-      k8s-dependencies:
-        patterns:
-          - "k8s.io*"
-          - "sigs.k8s.io*"
-      github-dependencies:
-        patterns:
-          - "github.com*"
-        exclude-patterns:
-          - "github.com/ceph/*"
-          - "github.com/golang*"
-          - "github.com/container-storage-interface/spec"
     labels:
       - rebase
     commit-message:
@@ -62,31 +45,6 @@ updates:
     labels:
       - rebase
       - ci/skip/e2e
-      - ci/skip/multi-arch-build
-    commit-message:
-      prefix: "rebase"
-  - package-ecosystem: "gomod"
-    directory: "/api"
-    schedule:
-      interval: "weekly"
-    rebase-strategy: "disabled"
-    groups:
-      golang-dependencies:
-        patterns:
-          - "github.com/golang*"
-      k8s-dependencies:
-        patterns:
-          - "k8s.io*"
-          - "sigs.k8s.io*"
-      github-dependencies:
-        patterns:
-          - "github.com*"
-        exclude-patterns:
-          - "github.com/golang*"
-    labels:
-      - rebase
-      - ci/skip/e2e
-      - ci/skip/multi-arch-build
     commit-message:
       prefix: "rebase"
   - package-ecosystem: "github-actions"
