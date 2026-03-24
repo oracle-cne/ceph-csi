@@ -18,8 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository == 'ceph/ceph-csi'
     steps:
-      # yamllint disable-line rule:line-length
-      - uses: actions/stale@997185467fa4f803885201cee163a9f38240193d  # v10.1.1
+      - uses: actions/stale@v7
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           days-before-issue-stale: 30
