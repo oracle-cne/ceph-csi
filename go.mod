@@ -52,6 +52,25 @@ require (
 
 replace k8s.io/client-go => k8s.io/client-go v0.35.0
 
+replace (
+	k8s.io/cli-runtime => k8s.io/cli-runtime v0.35.0
+	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.35.0
+	k8s.io/cri-api => k8s.io/cri-api v0.35.0
+	k8s.io/cri-client => k8s.io/cri-client v0.35.0
+	k8s.io/dynamic-resource-allocation => k8s.io/dynamic-resource-allocation v0.35.0
+	k8s.io/endpointslice => k8s.io/endpointslice v0.35.0
+	k8s.io/externaljwt => k8s.io/externaljwt v0.35.0
+	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.35.0
+	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.35.0
+	k8s.io/kube-proxy => k8s.io/kube-proxy v0.35.0
+	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.35.0
+	k8s.io/kubectl => k8s.io/kubectl v0.35.0
+	k8s.io/kubelet => k8s.io/kubelet v0.35.0
+	k8s.io/metrics => k8s.io/metrics v0.35.0
+	k8s.io/pod-security-admission => k8s.io/pod-security-admission v0.35.0
+	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.35.0
+)
+
 exclude (
 	// missing tag, referred to by github.com/hashicorp/go-kms-wrapping@v0.5.1
 	github.com/hashicorp/vault/sdk v0.1.14-0.20191229212425-c478d00be0d6
