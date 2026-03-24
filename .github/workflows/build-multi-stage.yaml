@@ -8,19 +8,12 @@ on:
 permissions:
   contents: read
 
-# cancel the in-progress workflow when PR is refreshed.
-concurrency:
-  # yamllint disable-line rule:truthy rule:line-length
-  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
-  cancel-in-progress: true
-
 jobs:
   codespell:
     name: multi-arch-build
     runs-on: ubuntu-latest
     steps:
-      # yamllint disable-line rule:line-length
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
+      - uses: actions/checkout@v3
       - name: multi-arch-build
         # yamllint disable-line rule:line-length
         if: ${{ ! contains(github.event.pull_request.labels.*.name, 'ci/skip/multi-arch-build') }}
