@@ -1,0 +1,22 @@
+diff --git Makefile Makefile
+index 2f910e8..172f44e 100644
+--- Makefile
++++ Makefile
+@@ -55,6 +55,8 @@ CEPH_VERSION ?= $(shell . $(CURDIR)/build.env ; echo $${CEPH_VERSION})
+ # The 'ceph_preview' tag may be needed for unstable/unreleased APIs.
+ GO_TAGS_LIST ?= $(CEPH_VERSION) ceph_preview
+ 
++GOFLAGS="-trimpath=false"
++
+ # CephCSI currently has 4 modules in these directories.
+ GO_MODULES_LIST = ./ e2e/ api/ actions/retest
+ 
+@@ -171,7 +173,7 @@ commitlint:
+ .PHONY: cephcsi
+ cephcsi: check-env
+ 	if [ ! -d ./vendor ]; then (go mod tidy && go mod vendor); fi
+-	GOOS=linux go build $(GO_TAGS) -mod vendor -a -ldflags '$(LDFLAGS)' -o _output/cephcsi ./cmd/
++	GOOS=linux go build $(GOFLAGS) $(GO_TAGS) -mod vendor -a -ldflags '$(LDFLAGS)' -o _output/cephcsi ./cmd/
+ 
+ e2e.test: check-env
+ 	cd e2e && go test $(GO_TAGS) -mod=vendor -c -o ../e2e.test ./
