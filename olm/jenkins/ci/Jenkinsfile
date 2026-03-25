@@ -1,0 +1,15 @@
+@Library('olcne-pipeline') _
+import com.oracle.olcne.pipeline.BranchPattern
+
+String csiVersion = '3.16.0'
+String imgTag = "v" + csiVersion
+
+olcnePipeline(
+  branchPattern: new BranchPattern(master: 'oracle/release/' + csiVersion, feature: '(?!^release/.*$)(^.*$)'),
+  containers: [
+    ('container-registry.oracle.com/olcne/cephcsi:' + imgTag) : 'olcne/cephcsi:' + imgTag,
+  ],
+  platforms: ['ol8'],
+  architectures: ['x86_64', 'aarch64'],
+  yumOL8Repos: ['ol8_appstream', 'ol8_codeready_builder', 'ol8_addons'],
+)
