@@ -1,5 +1,5 @@
 diff --git Makefile Makefile
-index 3d984dcfa..444bb98f2 100644
+index f7157dc84..b07a414f4 100644
 --- Makefile
 +++ Makefile
 @@ -55,6 +55,8 @@ CEPH_VERSION ?= $(shell . $(CURDIR)/build.env ; echo $${CEPH_VERSION})
@@ -8,10 +8,10 @@ index 3d984dcfa..444bb98f2 100644
  
 +GOFLAGS="-trimpath=false"
 +
- # go build flags
- LDFLAGS ?=
- LDFLAGS += -X $(GO_PROJECT)/internal/util.GitCommit=$(GIT_COMMIT)
-@@ -167,7 +169,7 @@ commitlint:
+ # CephCSI currently has 4 modules in these directories.
+ GO_MODULES_LIST = ./ e2e/ api/ actions/retest
+ 
+@@ -171,7 +173,7 @@ commitlint:
  .PHONY: cephcsi
  cephcsi: check-env
  	if [ ! -d ./vendor ]; then (go mod tidy && go mod vendor); fi
@@ -19,4 +19,4 @@ index 3d984dcfa..444bb98f2 100644
 +	GOOS=linux go build $(GOFLAGS) $(GO_TAGS) -mod vendor -a -ldflags '$(LDFLAGS)' -o _output/cephcsi ./cmd/
  
  e2e.test: check-env
- 	go test $(GO_TAGS) -mod=vendor -c ./e2e
+ 	cd e2e && go test $(GO_TAGS) -mod=vendor -c -o ../e2e.test ./
