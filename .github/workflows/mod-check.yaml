@@ -8,18 +8,11 @@ on:
 permissions:
   contents: read
 
-# cancel the in-progress workflow when PR is refreshed.
-concurrency:
-  # yamllint disable-line rule:truthy rule:line-length
-  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
-  cancel-in-progress: true
-
 jobs:
   mod-check:
     name: mod-check
     runs-on: ubuntu-latest
     steps:
-      # yamllint disable-line rule:line-length
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      - uses: actions/checkout@v3
       - name: mod-check
-        run: make containerized-test TARGET=mod-check
+        run: CONTAINER_CMD=docker make containerized-test TARGET=mod-check
